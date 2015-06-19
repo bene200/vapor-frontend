@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>VAPoR tests</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" media="all" href="./test_modules/mocha/mocha.css">
+    </head>
+<body>
+    <div id="mocha"><p><a href=".">Index</a></p></div>
+    <div id="messages"></div>
+    <div id="fixtures"></div>
+    <!-- program -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="./globals.js"></script>
+    <!-- test -->
+    <script src="./test_modules/mocha/mocha.js"></script>
+    <script src="./test_modules/chai/chai.js"></script>
+    <script>mocha.setup('bdd');</script>
+    <script src="./test_transformer.js"></script>
+    <script>mocha.run();</script>
+</body>
+</html>
