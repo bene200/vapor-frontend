@@ -146,19 +146,24 @@ function showInformation(id, data){
         info = _.filter(data.anno, function(el){
             var flag = false;
             if(el !== null){
-                flag =  (el.query.indexOf(id) !== -1 
-                    || id.indexOf(el.locusname) !== -1);
+                flag =  el.query.indexOf(id) !== -1;
+                if(!flag && el.locusname){
+                    flag = id.indexOf(el.locusname) !== -1;
+                }
             }
             return flag; 
         })[0],
         infoHtml = null,
         html = null,
         div = document.getElementById("gene-info");
+
+    console.log(info);
     
     if(info !== undefined){
         infoHtml = [
             { name: "Organism", entry: info.os },
             { name: "Gene name", entry: info.gene },
+            { name: "LocusName", entry: info.locusname },
             { name: "Annotation", entry: info.func },
             { name: "GO Terms", entry: info.goterms.join("<br>") }
         ]
@@ -167,6 +172,7 @@ function showInformation(id, data){
         infoHtml = [
             { name: "Organism", entry: "No data" },
             { name: "Gene name", entry: "No data" },
+            { name: "LocusName", entry: "No data" },
             { name: "Annotation", entry: "No data" },
             { name: "GO Terms", entry: "No data" }
         ]
