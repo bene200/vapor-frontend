@@ -3,11 +3,14 @@ $(document).ready(function(){
     var req = require("request");
 
     //Vapor REST-URL, Galaxy URL and API key
-    var restURL = "localhost:3000";
+    var restURL = "http://10.0.63.98:3000";
 
     //Get submit button and file from file upload and text field of file upload
     var submit = document.getElementById("submit"),
         fileUpload = document.getElementById("candidate");
+
+    //init with example sequence
+    fileUpload.value = ">example\nMAARQQQKGTGFGVQYEDFVPKSEWKDQPEATILNIDLTGFAKEQMKVTYVHSSKMIRVTGERPLANRKWSRFNEVFTVPQNCLVDKIHGSFKNNVLTITMPKETITKVAYLPETSRTEAAALEKAAKLEEKRLLEESRRKEKEEEEAKQMKKQLLEEKEALIRKLQEEAKAKEEAEMRKLQEEAKAKEEAAAKKLQEEIEAKEKLEERKLEERRLEERKLEDMKLAEEAKLKKIQERKSVDESGEKEKILKPEVVYTKSGHVATPKPESGSGLKSGFGGVGEVVKSAEEKLGNLVEKEKKMGKGIMEKIRRKEITSEEKKLMMNVGVAALVIFALGAYVSYTFCSSSSSSSSSSPSSSSSSTKPE";
 
     //A click on the submit button triggers upload and data transformation
     submit.addEventListener("click", function(e){
@@ -24,7 +27,7 @@ $(document).ready(function(){
             l.start();
 
             req({
-                uri: "http://10.0.63.98:3000",
+                uri: restURL,
                 method: "POST",
                 json: { query: query }
             }, function(err, req, body){

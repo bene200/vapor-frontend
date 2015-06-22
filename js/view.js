@@ -1,5 +1,4 @@
 var View = module.exports = function(data){
-    console.log("hello do I do this");
     this.vaporObj = data;
     this.msa = null;
     this.tree = null;
@@ -21,7 +20,6 @@ function initTree(newick){
         .layout(tnt.tree.layout.vertical()
             .width(550)
             .scale(true));
-    console.log(treeVis);
     return treeVis;
 }
 
@@ -102,7 +100,6 @@ function initMsa(clustal){
 }
 
 function setEvents(tree, msa, data){
-    console.log(tree);
     var m = require("msa"),
         hide = null,
         names = [],
@@ -149,7 +146,8 @@ function showInformation(id, data){
         info = _.filter(data.anno, function(el){
             var flag = false;
             if(el !== null){
-                flag =  (el.query.indexOf(id) !== -1);
+                flag =  (el.query.indexOf(id) !== -1 
+                    || id.indexOf(el.locusname) !== -1);
             }
             return flag; 
         })[0],
@@ -198,14 +196,12 @@ function tableFromObj(info){
 }
 
 function showInteractions(id, data){
-    
     var _ = require("underscore"),
         net = {},
         nodes = [],
         edges = [],
         query = id + "H";
 
-    console.log(data.interactions);
     net = _.filter(data.interactions, function(el){
         return el.id === query;
     })[0].graph;
