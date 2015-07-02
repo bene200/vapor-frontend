@@ -3,14 +3,11 @@
     <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="style/style.css">
+        <link rel="stylesheet" type="text/css" href="./lib/tooltipster-master/css/tooltipster.css" />
         <link rel="stylesheet" href="lib/ladda-bootstrap-master/dist/ladda-themeless.min.css">
         <link rel="stylesheet" href="http://emepyc.github.io/tnt/v0/tnt.css" type="text/css" />
         <link type="text/css" rel="stylesheet" href="http://parce.li/bundle/msa@0.4.0">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <!--loading spinner-->
-        <script src="lib/ladda-bootstrap-master/dist/spin.min.js"></script>
-        <script src="lib/ladda-bootstrap-master/dist/ladda.min.js"></script>
         
         <title>Not exactly VAPoR anymore</title>
     </head>
@@ -36,7 +33,6 @@
                     <div class="col-md-2">
                         <br><br>
                         <button class="btn btn-primary ladda-button" data-style="expand-right" id="submit"><span class="ladda-label">Submit</span></button>
-                        <button class="btn btn-primary" id="load_recent">Load</button>
                     </div>
                     <h4>Log</h4>
                     <div class="col-md-6" id="descr">
@@ -58,11 +54,23 @@
                     </div>
                     <div class="col-md-6" id="gene-info"></div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6">
+                        <div id="expr"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- scripts -->
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script type="text/javascript" src="./lib/tooltipster-master/js/jquery.tooltipster.min.js"></script>
+        <!--loading spinner-->
+        <script src="lib/ladda-bootstrap-master/dist/spin.min.js"></script>
+        <script src="lib/ladda-bootstrap-master/dist/ladda.min.js"></script>
         <script src="http://emepyc.github.io/tnt/v0/tnt.min.js" charset="utf-8"></script>
         <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
         <script src="./js/appbundle.js"></script>

@@ -3,7 +3,8 @@ $(document).ready(function(){
     var req = require("request");
 
     //Vapor REST-URL, Galaxy URL and API key
-    var restURL = "http://10.0.63.98:3000";
+    // var restURL = "http://10.0.63.98:3000";
+    var restURL = "http://localhost:3000";
 
     //Get submit button and file from file upload and text field of file upload
     var submit = document.getElementById("submit"),
@@ -31,7 +32,6 @@ $(document).ready(function(){
                 method: "POST",
                 json: { query: query }
             }, function(err, req, body){
-                console.log(body);
                 v = new View(body);
                 v.init();
                 v.render();

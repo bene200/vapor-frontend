@@ -3,6 +3,7 @@ var View = module.exports = function(data){
     this.msa = null;
     this.tree = null;
     this.cyto = null;
+    this.logbox = document.getElementById("log");
 }
 
 View.prototype.init = function(){
@@ -129,7 +130,7 @@ function setEvents(tree, msa, data){
                 msa.g.selcol.reset();
                 msa.g.selcol.add(new m.selection.rowsel({seqId: node.data().vaporId}));
                 showInteractions(id, data);
-                showInformation(id, data);
+                showExpression(id, data);
             }
         }
         else {
@@ -141,7 +142,38 @@ function setEvents(tree, msa, data){
     tree.on("click", treeClick);
 }
 
-function showInformation(id, data){
+function showExpression(id, data){
+    var RnaExpr = require("../lib/biojs-rnaexpression/js/rnaexpr"),
+        _ = require("underscore"),
+        rna = null,
+        exprInfo = null,
+        info = null,
+        logbox = document.getElementById("log");
+
+    //clear on new click
+    var ele = document.getElementById("expr");
+    ele.innerHTML = "";
+    
+    //display expression
+    info = _.filter(data.expr, function(el){ 
+        return el.query.indexOf(id) !== -1 
+    })[0];
+    if(info !== undefined){
+        exprInfo = {
+            orga: "tair",
+            name: id.replace(/_ARAT/g, ""),
+            flower: parseFloat(info.flower).toFixed(2),
+            roots: parseFloat(info.roots).toFixed(2),
+            leaves: parseFloat(info.leaves).toFixed(2),
+            stem: parseFloat(info.stem).toFixed(2)
+        }
+        rna = new RnaExpr(exprInfo);
+        rna.render();
+    }
+    logbox.value = "Showing expression for " + id + "\n" + logbox.value;
+}
+
+function getInformation(id, data){
     var _ = require("underscore"),
         info = _.filter(data.anno, function(el){
             var flag = false;
@@ -152,53 +184,9 @@ function showInformation(id, data){
                 }
             }
             return flag; 
-        })[0],
-        infoHtml = null,
-        html = null,
-        div = document.getElementById("gene-info");
+        })[0];
 
-    console.log(info);
-    
-    if(info !== undefined){
-        infoHtml = [
-            { name: "Organism", entry: info.os },
-            { name: "Gene name", entry: info.gene },
-            { name: "LocusName", entry: info.locusname },
-            { name: "Annotation", entry: info.func },
-            { name: "GO Terms", entry: info.goterms.join("<br>") }
-        ]
-    }
-    else {
-        infoHtml = [
-            { name: "Organism", entry: "No data" },
-            { name: "Gene name", entry: "No data" },
-            { name: "LocusName", entry: "No data" },
-            { name: "Annotation", entry: "No data" },
-            { name: "GO Terms", entry: "No data" }
-        ]
-    }
-    html = tableFromObj(infoHtml);
-    div.innerHTML = html;
-}
-
-function tableFromObj(info){
-    var obj = null,
-        html = '<table class="table-bordered" id="info-table">';
-    
-    for(var i=0; i<info.length; i++){
-        obj = info[i];
-        html += '<tr>';
-        html += '<td>';
-        html += obj.name;
-        html += '</td>';
-        html += '<td>';
-        html += obj.entry;
-        html += '</td>';
-        html += '</tr>';
-    }
-    html += '</table>';
-
-    return html;
+    return info;
 }
 
 function showInteractions(id, data){
@@ -206,7 +194,8 @@ function showInteractions(id, data){
         net = {},
         nodes = [],
         edges = [],
-        query = id + "H";
+        query = id + "H",
+        logbox = document.getElementById("log");
 
     net = _.filter(data.interactions, function(el){
         return el.id === query;
@@ -264,9 +253,9 @@ function showInteractions(id, data){
                 this.center();
                 this.fit();
                 this.on('tap', function(evt){
-                    var node = evt.cyTarget;
-                    showInformation(node.id(), data);
+                    showExpression(id, data);
                 });
+                logbox.value = "Showing interactions for " + id + "\n" + logbox.value;
             }
         });
 };
@@ -286,10 +275,38 @@ function searchEntry(acc, data){
 }
 
 View.prototype.render = function(){
-    var treeDiv = document.getElementById("tnt");
+    var treeDiv = document.getElementById("tnt"),
+        self = this;
     treeDiv.innerHTML = "";
     this.tree(treeDiv);
     this.msa.render();
+
+    //tooltips need to be added after rendering
+    $(".leaf").each(function(){
+        $(this).tooltipster({
+            content: getGoTerms(this.childNodes[1].innerHTML, self.vaporObj)
+        });
+    });
+
+    //log info
+    self.logbox.value = "Rendered successfully\n" + self.logbox.value;
+}
+
+function getGoTerms(id, data){
+    var info = getInformation(id, data),
+        result = ""
+        parts = [],
+        gos = [];
+
+    if(info){
+        for(var i=0; i<info.goterms.length; i++){
+            parts = info.goterms[i].split(";");
+            gos.push(parts[0] + " " + parts[1]);
+        }
+        result = $("<span>" + gos.toString()
+                            .replace(/,/g, "<br>") + "</span>");
+    }
+    return result;
 }
 
 module.exports = View;
