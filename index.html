@@ -4,61 +4,69 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="style/style.css">
         <link rel="stylesheet" type="text/css" href="./lib/tooltipster-master/css/tooltipster.css" />
-        <link rel="stylesheet" href="lib/ladda-bootstrap-master/dist/ladda-themeless.min.css">
         <link rel="stylesheet" href="http://emepyc.github.io/tnt/v0/tnt.css" type="text/css" />
         <link type="text/css" rel="stylesheet" href="http://parce.li/bundle/msa@0.4.0">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
         <title>Not exactly VAPoR anymore</title>
     </head>
     <body>
         <!-- whole page content -->
         <div class="container-fluid" id="vapor">
-            <!-- vapor user interface -->
-            <div class="container" id="program">
-                <h1>Annotation of Plant Genes based on Homologues in A. thaliana</h1>
-                <br>
-                <!-- program input and description -->
-                <div class="row">
-                    <div class="col-md-6">
+            <div class="container" id="page-content">
+                <div class="container" id="headerwrap">
+                    <h1>Annotation of Plant Genes based on Homologues in A. thaliana</h1>
+                </div>
+                <!-- vapor user interface -->
+                <div class="container" id="program">
+                    <!-- program input and description -->
+                    <div class="row" id="descr">
+                        <br><br>
                         <p>This is a tool designed for the visualisation of genetic information about a sequence base on what's known about homologous sequences in <i>a. thaliana</i>.</p>
                         <p>We want to show how BioJS can be used on top of Galaxy to put relevant infomration on people's fingertips</p>
                         <p>As a usecase we focus on Arabidopsis due to the abundance of data on the organism. This allows us to show the power of the approach</p>
                     </div>
-                </div>
-                <div class="row" id="input">
-                    <div class="col-md-4" id="upload">
-                        <textarea rows="5" cols="50" id="candidate"></textarea>
+                    <div class="row" id="input">
+                        <div class="col-md-4" id="upload">
+                            <textarea rows="5" cols="50" id="candidate"></textarea>
+                        </div>
+                        <div class="col-md-1">
+                            <br><br>
+                            <button class="btn btn-primary ladda-button" data-style="expand-right" id="submit"><span class="ladda-label">Submit</span></button>
+                        </div>
+                        <div class="col-md-1">
+                            <div id="spinner"></div>
+                        </div>
+                        <h4>Log</h4>
+                        <div class="col-md-6" id="descr">
+                            <textarea rows="3" cols="50" id="log" readonly></textarea>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <br><br>
-                        <button class="btn btn-primary ladda-button" data-style="expand-right" id="submit"><span class="ladda-label">Submit</span></button>
+                    <div class="row">
+                        <!--div for the phylogenetic tree viewer -->
+                        <div class="col-md-5" id="tnt"></div>
+                        <!--div for the multiple sequence alignment -->
+                        <div class="col-md-6">
+                            <div id="msa"></div>
+                        </div>
+                        <div class="col-md-1">
+                        </div>
                     </div>
-                    <h4>Log</h4>
-                    <div class="col-md-6" id="descr">
-                        <textarea rows="3" cols="50" id="log" readonly></textarea>
+                    <div class="row">
+                        <!--div for cytoscape -->
+                        <div class="col-md-6">
+                            <div id="cy"></div>
+                            <div id="gene-info"></div>
+                        </div>
+                        <div class="col-md-6"></div>
                     </div>
-                </div>
-                <div class="row">
-                    <!--div for the phylogenetic tree viewer -->
-                    <div class="col-md-6" id="tnt"></div>
-                    <!--div for the multiple sequence alignment -->
-                    <div class="col-md-6">
-                        <div id="msa"></div>
-                    </div>
-                </div>
-                <div class="row">
-                    <!--div for cytoscape -->
-                    <div class="col-md-6">
-                        <div id="cy"></div>
-                    </div>
-                    <div class="col-md-6" id="gene-info"></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                    </div>
-                    <div class="col-md-6">
-                        <div id="expr"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-4">
+                            <div id="expr"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,11 +76,6 @@
         <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
         <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         <script type="text/javascript" src="./lib/tooltipster-master/js/jquery.tooltipster.min.js"></script>
-        <!--loading spinner-->
-        <script src="lib/ladda-bootstrap-master/dist/spin.min.js"></script>
-        <script src="lib/ladda-bootstrap-master/dist/ladda.min.js"></script>
-        <script src="http://emepyc.github.io/tnt/v0/tnt.min.js" charset="utf-8"></script>
-        <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
         <script src="./js/appbundle.js"></script>
     </body>
 </html>
