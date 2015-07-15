@@ -104,7 +104,8 @@ AnnoCol.prototype.find = function(id){
 
     //Get submit button and file from file upload and text field of file upload
     var submit = document.getElementById("submit"),
-        fileUpload = document.getElementById("candidate");
+        fileUpload = document.getElementById("candidate")
+        log = document.getElementById("log");
 
     //init with example sequence
     fileUpload.value = ">example\nMAARQQQKGTGFGVQYEDFVPKSEWKDQPEATILNIDLTGFAKEQMKVTYVHSSKMIRVTGERPLANRKWSRFNEVFTVPQNCLVDKIHGSFKNNVLTITMPKETITKVAYLPETSRTEAAALEKAAKLEEKRLLEESRRKEKEEEEAKQMKKQLLEEKEALIRKLQEEAKAKEEAEMRKLQEEAKAKEEAAAKKLQEEIEAKEKLEERKLEERRLEERKLEDMKLAEEAKLKKIQERKSVDESGEKEKILKPEVVYTKSGHVATPKPESGSGLKSGFGGVGEVVKSAEEKLGNLVEKEKKMGKGIMEKIRRKEITSEEKKLMMNVGVAALVIFALGAYVSYTFCSSSSSSSSSSPSSSSSSTKPE";
@@ -122,6 +123,7 @@ AnnoCol.prototype.find = function(id){
         else {
             //Trigger loading spinner
             spinner.style.visibility = "visible";
+            log.value = "Processing data ... \n";
 
             req({
                 uri: restURL,
@@ -157,7 +159,7 @@ var chroma = require("chroma-js");
 var Controller = module.exports = function(obj){
     //log
     this.logbox = document.getElementById("log");
-
+    this.logbox.value = "Successful. Rendering ... \n" + this.logbox.value;
     //models
     this.interactions = obj.interactions;
     this.msa = obj.msa;
@@ -283,7 +285,7 @@ Controller.prototype.showInteractions = function(id, success){
     var geneInfo = document.getElementById("gene-info"),
         cyEl = document.getElementById("cy"),
         cytoView = null;
-        log = this.logbox.value,
+        log = this.logbox,
         self = this,
         eles = null;
 
@@ -303,14 +305,14 @@ Controller.prototype.showInteractions = function(id, success){
         self.view.cyto = cytoView;
         success();
     });
-    log += "Showing expression for " + id + "\n" + log;
+    log.value = "Showing interactions for " + id + "\n" + log.value;
 }
 
 Controller.prototype.showExpression = function(id){
     var rna = null,
         exprInfo = null,
         info = null,
-        log = this.logbox.value;
+        log = this.logbox;
 
     //clear old before showing new
     var ele = document.getElementById("expr");
@@ -336,7 +338,7 @@ Controller.prototype.showExpression = function(id){
     else {
         ele.innerHTML = "<p>No expression data for gene " + id + "</p>";
     }
-    log += "Showing expression for " + id + "\n" + log;
+    log.value = "Showing expression for " + id + "\n" + log.value;
 }
 
 Controller.prototype.msaClick = function(data){
@@ -386,6 +388,7 @@ Controller.prototype.treeColorMap = function(){
 },{"../lib/biojs-rnaexpression/js/rnaexpr":12,"./cyto-view":5,"./view":9,"chroma-js":35,"msa":47,"underscore":278}],5:[function(require,module,exports){
 var cytoscape = require("cytoscape");
 var chroma = require("chroma-js");
+var _ = require("underscore");
 
 var CytoView = module.exports = function(eles){
     this.elements = eles;
@@ -450,6 +453,11 @@ CytoView.prototype.setColors = function(anno){
         }
         else {
             nodes[i].data.color = "#66CCFF";
+            _.each(nodes[i].data.refids, function(el){
+                if(anno.find(el)){
+                    nodes[i].data.color = "#ff6666";
+                }
+            });
         }
     }
 
@@ -474,13 +482,14 @@ CytoView.prototype.render = function(success){
         ready: function(){
             this.fit();
             this.center();
+            this.height(700);
             self.cy = this;
             success();
         }
     });
 }
 
-},{"chroma-js":35,"cytoscape":36}],6:[function(require,module,exports){
+},{"chroma-js":35,"cytoscape":36,"underscore":278}],6:[function(require,module,exports){
 var _ = require("underscore");
 
 var Interactions = module.exports = function(net){
@@ -593,6 +602,7 @@ TreeView.prototype.setNodeCols = function(map){
 },{"tnt.tree":260,"underscore":278}],9:[function(require,module,exports){
 var msa = require("msa");
 var TreeView = require("./tree-view");
+var _ = require("underscore");
 
 var View = module.exports = function(c){
     this.m = null;
@@ -666,15 +676,33 @@ View.prototype.setTreeEvents = function(){
 View.prototype.setCyEvents = function(){
     var self = this,
         geneInfo = document.getElementById("gene-info"),
-        anno = null;
+        anno = null,
+        found = null;
 
     //cytoscape events
     if(this.cyto.cy){
         this.cyto.cy.on("tap", "node", function(evt){
-            self.c.showExpression(this.data().label);
+            anno = self.c.anno.find(this.data().label);
+            if(!anno){
+                _.each(this.data().refids, function(el){
+                    found = self.c.anno.find(el);
+                    if(found){
+                        anno = found;
+                    }
+                });
+            }
+            anno ? self.c.showExpression(anno.query) : self.c.showExpression(this.data().label);
         });
         this.cyto.cy.on("tapdrag", "node", function(evt){
             anno = self.c.anno.find(this.data().label);
+            if(!anno){
+                _.each(this.data().refids, function(el){
+                    found = self.c.anno.find(el);
+                    if(found){
+                        anno = found;
+                    }
+                });
+            }
             if(anno){
                 geneInfo.innerHTML = "<span class='glyphicon glyphicon-remove-circle'\
                                      aria-hidden='true' id='showanno'></span>";
@@ -697,7 +725,7 @@ View.prototype.setMsaEvents = function(){
     });
 }
 
-},{"./tree-view":8,"msa":47}],10:[function(require,module,exports){
+},{"./tree-view":8,"msa":47,"underscore":278}],10:[function(require,module,exports){
 var ExprModel = module.exports = function(obj){
     var chroma = require("chroma-js");
     var scale = chroma.scale(["green", "red"]).mode("lab");
@@ -793,15 +821,15 @@ ExprView.prototype.render = function(cols){
             .on('mouseout', tipStem.hide);
 
         svg.append("svg")
-        .attr("width", 200)
+        .attr("width", 400)
         .attr("height", 200)
-        .attr("y", 10)
+        .attr("y", 0)
         .selectAll("rect")
         .data(self.legend).enter()
         .append("rect")
-            .attr("x", function(e) { 
+            .attr("x", function(e) {
                 var value = e.val * 10 * 12;
-                value += 10;
+                value += 200;
                 return value; })
             .attr("y", 50)
             .attr("width", 12)
@@ -814,7 +842,7 @@ ExprView.prototype.render = function(cols){
 
 function getPathFile(orga){
     var result;
-    
+
     switch(orga){
         case "tair":
             result = getTairPathFile();
@@ -826,7 +854,7 @@ function getPathFile(orga){
 }
 
 function getTairPathFile(){
-    var pathData = "../data/tair.html";
+    var pathData = "../data/new_tair.html";
 
     return pathData;
 }

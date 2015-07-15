@@ -1,5 +1,6 @@
 var msa = require("msa");
 var TreeView = require("./tree-view");
+var _ = require("underscore");
 
 var View = module.exports = function(c){
     this.m = null;
@@ -73,15 +74,33 @@ View.prototype.setTreeEvents = function(){
 View.prototype.setCyEvents = function(){
     var self = this,
         geneInfo = document.getElementById("gene-info"),
-        anno = null;
+        anno = null,
+        found = null;
 
     //cytoscape events
     if(this.cyto.cy){
         this.cyto.cy.on("tap", "node", function(evt){
-            self.c.showExpression(this.data().label);
+            anno = self.c.anno.find(this.data().label);
+            if(!anno){
+                _.each(this.data().refids, function(el){
+                    found = self.c.anno.find(el);
+                    if(found){
+                        anno = found;
+                    }
+                });
+            }
+            anno ? self.c.showExpression(anno.query) : self.c.showExpression(this.data().label);
         });
         this.cyto.cy.on("tapdrag", "node", function(evt){
             anno = self.c.anno.find(this.data().label);
+            if(!anno){
+                _.each(this.data().refids, function(el){
+                    found = self.c.anno.find(el);
+                    if(found){
+                        anno = found;
+                    }
+                });
+            }
             if(anno){
                 geneInfo.innerHTML = "<span class='glyphicon glyphicon-remove-circle'\
                                      aria-hidden='true' id='showanno'></span>";

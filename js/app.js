@@ -15,7 +15,8 @@
 
     //Get submit button and file from file upload and text field of file upload
     var submit = document.getElementById("submit"),
-        fileUpload = document.getElementById("candidate");
+        fileUpload = document.getElementById("candidate")
+        log = document.getElementById("log");
 
     //init with example sequence
     fileUpload.value = ">example\nMAARQQQKGTGFGVQYEDFVPKSEWKDQPEATILNIDLTGFAKEQMKVTYVHSSKMIRVTGERPLANRKWSRFNEVFTVPQNCLVDKIHGSFKNNVLTITMPKETITKVAYLPETSRTEAAALEKAAKLEEKRLLEESRRKEKEEEEAKQMKKQLLEEKEALIRKLQEEAKAKEEAEMRKLQEEAKAKEEAAAKKLQEEIEAKEKLEERKLEERRLEERKLEDMKLAEEAKLKKIQERKSVDESGEKEKILKPEVVYTKSGHVATPKPESGSGLKSGFGGVGEVVKSAEEKLGNLVEKEKKMGKGIMEKIRRKEITSEEKKLMMNVGVAALVIFALGAYVSYTFCSSSSSSSSSSPSSSSSSTKPE";
@@ -33,6 +34,7 @@
         else {
             //Trigger loading spinner
             spinner.style.visibility = "visible";
+            log.value = "Processing data ... \n";
 
             req({
                 uri: restURL,

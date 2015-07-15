@@ -1,5 +1,6 @@
 var cytoscape = require("cytoscape");
 var chroma = require("chroma-js");
+var _ = require("underscore");
 
 var CytoView = module.exports = function(eles){
     this.elements = eles;
@@ -64,6 +65,11 @@ CytoView.prototype.setColors = function(anno){
         }
         else {
             nodes[i].data.color = "#66CCFF";
+            _.each(nodes[i].data.refids, function(el){
+                if(anno.find(el)){
+                    nodes[i].data.color = "#ff6666";
+                }
+            });
         }
     }
 
@@ -88,6 +94,7 @@ CytoView.prototype.render = function(success){
         ready: function(){
             this.fit();
             this.center();
+            this.height(700);
             self.cy = this;
             success();
         }

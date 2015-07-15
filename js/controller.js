@@ -8,7 +8,7 @@ var chroma = require("chroma-js");
 var Controller = module.exports = function(obj){
     //log
     this.logbox = document.getElementById("log");
-
+    this.logbox.value = "Successful. Rendering ... \n" + this.logbox.value;
     //models
     this.interactions = obj.interactions;
     this.msa = obj.msa;
@@ -134,7 +134,7 @@ Controller.prototype.showInteractions = function(id, success){
     var geneInfo = document.getElementById("gene-info"),
         cyEl = document.getElementById("cy"),
         cytoView = null;
-        log = this.logbox.value,
+        log = this.logbox,
         self = this,
         eles = null;
 
@@ -154,14 +154,14 @@ Controller.prototype.showInteractions = function(id, success){
         self.view.cyto = cytoView;
         success();
     });
-    log += "Showing expression for " + id + "\n" + log;
+    log.value = "Showing interactions for " + id + "\n" + log.value;
 }
 
 Controller.prototype.showExpression = function(id){
     var rna = null,
         exprInfo = null,
         info = null,
-        log = this.logbox.value;
+        log = this.logbox;
 
     //clear old before showing new
     var ele = document.getElementById("expr");
@@ -187,7 +187,7 @@ Controller.prototype.showExpression = function(id){
     else {
         ele.innerHTML = "<p>No expression data for gene " + id + "</p>";
     }
-    log += "Showing expression for " + id + "\n" + log;
+    log.value = "Showing expression for " + id + "\n" + log.value;
 }
 
 Controller.prototype.msaClick = function(data){
