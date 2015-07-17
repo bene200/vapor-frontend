@@ -14,13 +14,24 @@ var Controller = module.exports = function(obj){
     this.msa = obj.msa;
     this.phylotree = obj.phylotree;
     this.anno = obj.anno;
-    this.expr = obj.expr;
+    this.expr = _.map(obj.expr, function(el){
+        return {
+            name: el.query,
+            tissues: {
+                flower: el.flower,
+                leaves: el.leaves,
+                roots: el.roots,
+                stem: el.stem
+            }
+        };
+    });
 
     //view
     this.view = new View(this);
     this.view.init({
         msa: this.msa,
-        phylotree: this.phylotree
+        phylotree: this.phylotree,
+        expr: this.expr
     });
 }
 
@@ -158,36 +169,23 @@ Controller.prototype.showInteractions = function(id, success){
 }
 
 Controller.prototype.showExpression = function(id){
-    var rna = null,
-        exprInfo = null,
-        info = null,
-        log = this.logbox;
+    var ele = document.getElementById("expr"),
+        log = this.logbox,
+        gene = "";
 
     //clear old before showing new
-    var ele = document.getElementById("expr");
     ele.innerHTML = "";
 
-    //display expression
-    info = _.filter(this.expr, function(el){
-        return el.query.indexOf(id) !== -1
+    gene = _.filter(this.expr, function(el){
+        return el.name.indexOf(id) !== -1;
     })[0];
-    if(info !== undefined){
-        exprInfo = {
-            orga: "tair",
-            name: id.replace(/_ARAT/g, ""),
-            flower: parseFloat(info.flower).toFixed(2),
-            roots: parseFloat(info.roots).toFixed(2),
-            leaves: parseFloat(info.leaves).toFixed(2),
-            stem: parseFloat(info.stem).toFixed(2)
-        }
-        rna = new RnaExpr(exprInfo);
-        this.view.rna = rna;
-        rna.render();
+    if(gene){
+        self.view.rna.show(gene.name);
+        log.value = "Showing expression for " + id + "\n" + log.value;
     }
     else {
         ele.innerHTML = "<p>No expression data for gene " + id + "</p>";
     }
-    log.value = "Showing expression for " + id + "\n" + log.value;
 }
 
 Controller.prototype.msaClick = function(data){

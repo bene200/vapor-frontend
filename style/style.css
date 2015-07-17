@@ -136,7 +136,7 @@ btn-file {
 }
 
 #vapor {
-    background-image: url("http://l.rgbimg.com/cache1nurvF/users/s/su/sundesigns/600/meT1IqC.jpg");
+    background-image: url("../data/vapor-bg.jpg");
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -165,6 +165,10 @@ btn-file {
     color: #fff;
 }
 #descr {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+#opts {
     padding-left: 15px;
     padding-right: 15px;
 }

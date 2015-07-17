@@ -11,6 +11,7 @@ var TreeView = module.exports = function(data){
                 .width(400)
                 .scale(true));
     this.treeDiv = document.getElementById("tnt");
+    this.treeDiv.innerHTML = "";
 }
 
 TreeView.prototype.render = function(){

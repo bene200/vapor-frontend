@@ -1,5 +1,6 @@
 var msa = require("msa");
 var TreeView = require("./tree-view");
+var Xpress = require("biojs-xpression");
 var _ = require("underscore");
 
 var View = module.exports = function(c){
@@ -11,6 +12,7 @@ var View = module.exports = function(c){
 }
 
 View.prototype.init = function(data){
+    var self = this;
     var initMsa = function(clustal){
         var msaDiv = document.getElementById("msa"),
             opts = {},
@@ -28,7 +30,7 @@ View.prototype.init = function(data){
             zoomer: {
                 labelIdLength: 20,
                 rowHeight: 20,
-                alignmentHeight: 420
+                alignmentHeight: $(".tnt_groupDiv").children().height()-30
             }
         };
         m = msa(opts);
@@ -42,6 +44,11 @@ View.prototype.init = function(data){
     this.m.render();
     this.setTreeEvents();
     this.tree.setNodeCols(this.c.treeColorMap());
+    console.log(document.getElementById("expr"));
+    this.rna = new Xpress({
+        el: document.getElementById("expr"),
+        data: data.expr
+    });
 }
 
 View.prototype.arrangeMsaTree = function(){

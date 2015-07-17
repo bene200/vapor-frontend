@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="style/style.css">
         <link rel="stylesheet" type="text/css" href="./lib/tooltipster-master/css/tooltipster.css" />
@@ -8,9 +9,11 @@
         <link type="text/css" rel="stylesheet" href="http://parce.li/bundle/msa@0.4.0">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Not exactly VAPoR anymore</title>
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.7.0.min.js"></script>
+        <script type="text/javascript" src="./lib/tooltipster-master/js/jquery.tooltipster.min.js"></script>
     </head>
     <body>
-        <!-- whole page content -->
+        <!-- whole page conte   nt -->
         <div class="container-fluid" id="vapor">
             <div class="container" id="page-content">
                 <div class="container" id="headerwrap">
@@ -21,9 +24,11 @@
                     <!-- program input and description -->
                     <div class="row" id="descr">
                         <br><br>
-                        <p>This is a tool designed for the visualisation of genetic information about a sequence base on what's known about homologous sequences in <i>a. thaliana</i>.</p>
-                        <p>We want to show how BioJS can be used on top of Galaxy to put relevant infomration on people's fingertips</p>
-                        <p>As a usecase we focus on Arabidopsis due to the abundance of data on the organism. This allows us to show the power of the approach</p>
+                        <p>This tool designed visualises genetic information about a sequence based on information about homologous sequences in <i>a. thaliana</i>.</p>
+                    </div>
+                    <div class="row" id="opts">
+                        <h4>Options</h4>
+                        E-value threshold: <input type="text" id="cutoff" value="1.0e-10"><br>
                     </div>
                     <div class="row" id="input">
                         <div class="col-md-6" id="upload">
@@ -70,10 +75,6 @@
             </div>
         </div>
         <!-- scripts -->
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-        <script type="text/javascript" src="./lib/tooltipster-master/js/jquery.tooltipster.min.js"></script>
         <script src="./js/appbundle.js"></script>
     </body>
 </html>

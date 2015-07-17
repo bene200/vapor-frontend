@@ -11,7 +11,7 @@ var InterCol = module.exports = function(data){
 
 InterCol.prototype.find = function(id){
     var _ = require("underscore"),
-        query = id + "H",
+        query = id,
         net = {};
 
     net = _.filter(this.nets, function(el){
