@@ -2,6 +2,7 @@ var msa = require("msa");
 var TreeView = require("./tree-view");
 var Xpress = require("biojs-xpression");
 var _ = require("underscore");
+var Anno = require("./anno");
 
 var View = module.exports = function(c){
     this.m = null;
@@ -37,6 +38,7 @@ View.prototype.init = function(data){
         return m;
     };
     this.tree = new TreeView(data.phylotree);
+    this.tree.setGoTerms(this.c.anno);
     this.tree.render();
     this.m = initMsa(data.msa);
     this.arrangeMsaTree();
@@ -44,7 +46,6 @@ View.prototype.init = function(data){
     this.m.render();
     this.setTreeEvents();
     this.tree.setNodeCols(this.c.treeColorMap());
-    console.log(document.getElementById("expr"));
     this.rna = new Xpress({
         el: document.getElementById("expr"),
         data: data.expr
@@ -59,7 +60,8 @@ View.prototype.arrangeMsaTree = function(){
 
 View.prototype.setTreeEvents = function(){
     var self = this,
-        anno = null;
+        treeData = null,
+        depth = null;
 
     //tree events
     self.tree.treeVis.on("click", function(node){
@@ -68,19 +70,17 @@ View.prototype.setTreeEvents = function(){
         });
     });
     //tooltips on mouseover (dirty d3 hack)
-    $(".leaf").each(function(){
-        anno = self.c.anno.find(this.childNodes[1].innerHTML);
-        if(anno){
-            $(this).tooltipster({
-                content: $(anno.goAsHTML())
-            });
-        }
+    d3.selectAll("circle")
+        .attr("title", function(e){ return self.c.anno.annos[0].goAsHTML(e.gos); });
+    $("circle").tooltipster({
+        contentAsHTML: true
     });
 }
 
 View.prototype.setCyEvents = function(){
     var self = this,
         geneInfo = document.getElementById("gene-info"),
+        elabel = document.getElementById("edge-label"),
         anno = null,
         found = null;
 
@@ -119,6 +119,18 @@ View.prototype.setCyEvents = function(){
                     })
             }
         });
+
+        this.cyto.cy.on("tapdragover", "edge", function(evt){
+            var left  = event.clientX  + "px";
+            var top  = event.clientY  + "px";
+            elabel.style.left = left;
+            elabel.style.top = top;
+            elabel.innerHTML = this.data().experiment;
+            elabel.style.display = "block";
+        });
+        this.cyto.cy.on("tapdragout", "edge", function(evt){
+            elabel.style.display = "none";
+        });
     }
 }
 
@@ -126,6 +138,6 @@ View.prototype.setMsaEvents = function(){
     var self = this;
 
     self.m.g.on("row:click", function(data){
-        self.c.msaClick(data);
+        self.c.msaClick(data, function(){ console.log("Showing interactions after MSA click"); });
     });
 }

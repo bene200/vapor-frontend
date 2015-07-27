@@ -143,7 +143,6 @@ Controller.prototype.treeClick = function(node, success){
 
 Controller.prototype.showInteractions = function(id, success){
     var geneInfo = document.getElementById("gene-info"),
-        cyEl = document.getElementById("cy"),
         cytoView = null;
         log = this.logbox,
         self = this,
@@ -155,7 +154,8 @@ Controller.prototype.showInteractions = function(id, success){
     //convert data to proper cytoscape format
     eles = net.toCytoscape();
     //cytoscape element
-    cyEl.innerHTML = "";
+    document.getElementById("cy").innerHTML = "";
+    document.getElementById("legend").innerHTML = "";
 
     //display network
     cytoView = new CyView(eles);
@@ -188,46 +188,26 @@ Controller.prototype.showExpression = function(id){
     }
 }
 
-Controller.prototype.msaClick = function(data){
+Controller.prototype.msaClick = function(data, success){
     var self = this,
         id = "";
 
     id = self.view.m.seqs.at(data.seqId).get("name");
     self.showInteractions(id, function(){
         self.showExpression(id);
+        success();
     });
 }
 
 Controller.prototype.treeColorMap = function(){
-    var self = this,
-        tree = self.view.tree.treeVis,
-        map = [],
-        anno = null,
+    var map = [],
         scale = null,
         max = 0;
 
-    $(".leaf").each(function(){
-        anno = self.anno.find(this.childNodes[1].innerHTML);
-        if(anno){
-            map.push({
-                name: anno.query,
-                number: anno.goterms.length
-            });
-        }
-        else {
-            map.push({
-                name: this.childNodes[1].innerHTML,
-                number: 0
-            });
-        }
-    });
-    max = _.max(map, function(el){ return el.number; }).number;
-    scale = chroma.scale(["grey", "red"]).domain([0, max]);
-    map = _.map(map, function(el){
-        return {
-            name: el.name,
-            color: scale(el.number).hex()
-        };
-    });
-    return map;
+    max = _.max(d3.selectAll("circle").data(), function(e){
+            return e.gos.length;
+        }).gos.length;
+    scale = chroma.scale(["grey", "#00CC66"]).domain([0, max]);
+
+    return scale;
 }

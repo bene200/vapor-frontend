@@ -18,16 +18,34 @@ TreeView.prototype.render = function(){
     this.treeVis(this.treeDiv);
 }
 
-TreeView.prototype.setNodeCols = function(map){
+TreeView.prototype.setNodeCols = function(scale){
     var color = "",
         name = "";
 
-    d3.selectAll(".leaf")
-        .each(function(el){
-            name = this.childNodes[1].innerHTML;
-            color = _.find(map, function(el) {
-                return el.name.indexOf(name) !== -1;
-            }).color;
-            this.childNodes[0].style.fill = color;
+    d3.selectAll("circle").attr("fill", function(e){
+        return scale(e.gos.length).hex();
+    });
+}
+
+TreeView.prototype.setGoTerms = function(anno){
+    var root = this.treeVis.root(),
+        leaves = root.get_all_leaves(),
+        gos = null,
+        termLists = null;
+
+    //first set leave go terms
+    _.each(leaves, function(el){
+        gos = anno.find(el.data().name);
+        el.data().gos = gos ? gos.goterms : [];
+    });
+    //then apply intersection of child go terms for all other nodes
+    root.apply(function(n){
+        termLists = [];
+        leaves = n.get_all_leaves();
+        _.each(leaves, function(l){
+            termLists.push(l.data().gos);
         });
+        n.data().gos = _.intersection.apply(null, termLists);
+    });
+
 }

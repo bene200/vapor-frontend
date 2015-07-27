@@ -71,5 +71,6 @@ $(document).ready(function(){
         document.getElementById("cy").innerHTML = "";
         document.getElementById("gene-info").innerHTML = "";
         document.getElementById("expr").innerHTML = "";
+        document.getElementById("legend").innerHTML = "";
     }
 });

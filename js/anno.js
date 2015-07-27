@@ -6,9 +6,12 @@ var Anno = module.exports = function(obj){
     this.goterms = obj.goterms || [];
 }
 
-Anno.prototype.goAsHTML = function(){
-    var result;
-    result = "<span>" + this.goterms.toString()
+Anno.prototype.goAsHTML = function(lst){
+    if(!lst){
+        lst = this.goterms
+    }
+    var result = "";
+    result = "<span>" + lst.toString()
                             .replace(/,/g, "<br>") + "</span>";
     return result;
 }
@@ -25,7 +28,7 @@ Anno.prototype.asHTMLTable = function(){
     html += "<p>" + this.func + "</p>"
     //column headers
     html += "<tr><td>Identifier</td><td>Category</td><td>Term name</td></tr>";
-    //body 
+    //body
     for(var i=0; i<this.goterms.length; i++){
         goparts = this.goterms[i].split(";");
         split = goparts[1].split(":");
@@ -41,7 +44,7 @@ Anno.prototype.asHTMLTable = function(){
             cat = "Biological Process";
         }
 
-        html += "<tr><td>" 
+        html += "<tr><td>"
                 + term
                 + "</td><td>"
                 + cat

@@ -76,10 +76,10 @@ btn-file {
   -moz-animation: rotation .6s infinite linear;
   -o-animation: rotation .6s infinite linear;
   animation: rotation .6s infinite linear;
-  border-left: 6px solid rgba(0, 174, 239, .15);
-  border-right: 6px solid rgba(0, 174, 239, .15);
-  border-bottom: 6px solid rgba(0, 174, 239, .15);
-  border-top: 6px solid rgba(0, 174, 239, .8);
+  border-left: 6px solid rgba(0, 204, 102, .15);
+  border-right: 6px solid rgba(0, 204, 102, .12);
+  border-bottom: 6px solid rgba(0, 204, 102, .15);
+  border-top: 6px solid rgba(0, 204, 102, .9);
   border-radius: 100%;
   visibility: hidden;
 }
@@ -123,8 +123,7 @@ btn-file {
 #gene-info {
     display: none;
     position: absolute;
-    top: 25%;
-    left: 80%;
+    left: 95%;
     width: 70%;
     height: 500px;
     padding: 16px;
@@ -178,4 +177,18 @@ btn-file {
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
+}
+
+#legend {
+    padding-top: 500px;
+}
+#edge-label {
+    position: fixed;
+    display: none;
+    background-color: #00CC66;
+    color: #fff;
+    overflow: auto;
+    z-index: 1002;
+    padding: 3px;
+    border-radius: 7px;
 }

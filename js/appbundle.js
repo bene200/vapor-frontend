@@ -7,9 +7,12 @@ var Anno = module.exports = function(obj){
     this.goterms = obj.goterms || [];
 }
 
-Anno.prototype.goAsHTML = function(){
-    var result;
-    result = "<span>" + this.goterms.toString()
+Anno.prototype.goAsHTML = function(lst){
+    if(!lst){
+        lst = this.goterms
+    }
+    var result = "";
+    result = "<span>" + lst.toString()
                             .replace(/,/g, "<br>") + "</span>";
     return result;
 }
@@ -26,7 +29,7 @@ Anno.prototype.asHTMLTable = function(){
     html += "<p>" + this.func + "</p>"
     //column headers
     html += "<tr><td>Identifier</td><td>Category</td><td>Term name</td></tr>";
-    //body 
+    //body
     for(var i=0; i<this.goterms.length; i++){
         goparts = this.goterms[i].split(";");
         split = goparts[1].split(":");
@@ -42,7 +45,7 @@ Anno.prototype.asHTMLTable = function(){
             cat = "Biological Process";
         }
 
-        html += "<tr><td>" 
+        html += "<tr><td>"
                 + term
                 + "</td><td>"
                 + cat
@@ -160,6 +163,7 @@ $(document).ready(function(){
         document.getElementById("cy").innerHTML = "";
         document.getElementById("gene-info").innerHTML = "";
         document.getElementById("expr").innerHTML = "";
+        document.getElementById("legend").innerHTML = "";
     }
 });
 
@@ -309,7 +313,6 @@ Controller.prototype.treeClick = function(node, success){
 
 Controller.prototype.showInteractions = function(id, success){
     var geneInfo = document.getElementById("gene-info"),
-        cyEl = document.getElementById("cy"),
         cytoView = null;
         log = this.logbox,
         self = this,
@@ -321,7 +324,8 @@ Controller.prototype.showInteractions = function(id, success){
     //convert data to proper cytoscape format
     eles = net.toCytoscape();
     //cytoscape element
-    cyEl.innerHTML = "";
+    document.getElementById("cy").innerHTML = "";
+    document.getElementById("legend").innerHTML = "";
 
     //display network
     cytoView = new CyView(eles);
@@ -354,48 +358,28 @@ Controller.prototype.showExpression = function(id){
     }
 }
 
-Controller.prototype.msaClick = function(data){
+Controller.prototype.msaClick = function(data, success){
     var self = this,
         id = "";
 
     id = self.view.m.seqs.at(data.seqId).get("name");
     self.showInteractions(id, function(){
         self.showExpression(id);
+        success();
     });
 }
 
 Controller.prototype.treeColorMap = function(){
-    var self = this,
-        tree = self.view.tree.treeVis,
-        map = [],
-        anno = null,
+    var map = [],
         scale = null,
         max = 0;
 
-    $(".leaf").each(function(){
-        anno = self.anno.find(this.childNodes[1].innerHTML);
-        if(anno){
-            map.push({
-                name: anno.query,
-                number: anno.goterms.length
-            });
-        }
-        else {
-            map.push({
-                name: this.childNodes[1].innerHTML,
-                number: 0
-            });
-        }
-    });
-    max = _.max(map, function(el){ return el.number; }).number;
-    scale = chroma.scale(["grey", "red"]).domain([0, max]);
-    map = _.map(map, function(el){
-        return {
-            name: el.name,
-            color: scale(el.number).hex()
-        };
-    });
-    return map;
+    max = _.max(d3.selectAll("circle").data(), function(e){
+            return e.gos.length;
+        }).gos.length;
+    scale = chroma.scale(["grey", "#00CC66"]).domain([0, max]);
+
+    return scale;
 }
 
 },{"../lib/biojs-rnaexpression/js/rnaexpr":12,"./cyto-view":5,"./view":9,"chroma-js":41,"msa":54,"underscore":285}],5:[function(require,module,exports){
@@ -427,9 +411,7 @@ var CytoView = module.exports = function(eles){
         .selector('edge')
         .css({
             'width': 2,
-            'line-color': 'data(color)',
-            'content': 'data(experiment)',
-            'font-size': 8
+            'line-color': 'data(color)'
         });
 
     this.cy = null;
@@ -462,20 +444,20 @@ CytoView.prototype.setColors = function(anno){
     //nodes
     for(var i=0; i<nodes.length; i++){
         if(anno.find(nodes[i].data.label)){
-            nodes[i].data.color = "#ff6666";
+            nodes[i].data.color = "#00CC66";
         }
         else {
             nodes[i].data.color = "#66CCFF";
             _.each(nodes[i].data.refids, function(el){
                 if(anno.find(el)){
-                    nodes[i].data.color = "#ff6666";
+                    nodes[i].data.color = "#00CC66";
                 }
             });
         }
     }
 
     //edges
-    scale = chroma.scale(["red", "green"]);
+    scale = chroma.scale(["green", "red"]);
     for(var i=0; i<edges.length; i++){
         col = scale(parseFloat(edges[i].data.confidence)).hex();
         edges[i].data.color = col;
@@ -500,6 +482,116 @@ CytoView.prototype.render = function(success){
             success();
         }
     });
+
+    self.drawLegend();
+}
+
+CytoView.prototype.drawLegend = function(){
+    var svg = d3.select("#legend").append("svg")
+        .attr("width", 555)
+        .attr("height", 105);
+    svg.append("circle")
+        .attr("r", 20)
+        .attr("cx", 40)
+        .attr("cy", 40)
+        .style("fill", "#66CCFF")
+
+    svg.append("text")
+        .attr("x", 70)
+        .attr("y", 43)
+        .text("No metadata")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "15px");
+
+    svg.append("circle")
+        .attr("r", 20)
+        .attr("cx", 200)
+        .attr("cy", 40)
+        .style("fill", "#00CC66");
+
+    svg.append("text")
+        .attr("x", 230)
+        .attr("y", 43)
+        .text("Has metadata")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "15px");
+
+    svg.append("path")
+        .attr("d", "M 360.000 55.000,\
+            L 374.695 60.225,\
+            L 374.266 44.635,\
+            L 383.776 32.275,\
+            L 368.817 27.865,\
+            L 360.000 15.000,\
+            L 351.183 27.865,\
+            L 336.224 32.275,\
+            L 345.734 44.635,\
+            L 345.305 60.225,\
+            L 360.000 55.000")
+        .attr("cx", 200)
+        .attr("cy", 40)
+        .style("fill", "#00CC66")
+        .style("stroke-width", 5);
+
+    svg.append("text")
+        .attr("x", 390)
+        .attr("y", 43)
+        .text("Query")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "15px");
+
+    svg.append("text")
+        .attr("x", 460)
+        .attr("y", 35)
+        .text("Node radius")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "10px");
+
+    svg.append("text")
+        .attr("x", 460)
+        .attr("y", 45)
+        .text("depends on degree")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "10px");
+
+    svg.append("text")
+        .attr("x", 20)
+        .attr("y", 85)
+        .text("Low")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "10px");
+
+    svg.append("text")
+        .attr("x", 20)
+        .attr("y", 95)
+        .text("confidence")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "10px");
+
+    //edge color gradient in legend
+    scale = chroma.scale(["green", "red"]);
+    svg.selectAll("rect")
+        .data([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]).enter()
+        .append("rect")
+        .attr("x", function(e){ return 77 + (10 * e * 20); })
+        .attr("y", 83)
+        .attr("width", 20)
+        .attr("height", 4)
+        .style("fill", function(e){ return scale(e).hex(); });
+
+    svg.append("text")
+        .attr("x", 310)
+        .attr("y", 85)
+        .text("High")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "10px");
+
+    svg.append("text")
+        .attr("x", 310)
+        .attr("y", 95)
+        .text("confidence")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "10px");
 }
 
 },{"chroma-js":41,"cytoscape":42,"underscore":285}],6:[function(require,module,exports){
@@ -599,18 +691,36 @@ TreeView.prototype.render = function(){
     this.treeVis(this.treeDiv);
 }
 
-TreeView.prototype.setNodeCols = function(map){
+TreeView.prototype.setNodeCols = function(scale){
     var color = "",
         name = "";
 
-    d3.selectAll(".leaf")
-        .each(function(el){
-            name = this.childNodes[1].innerHTML;
-            color = _.find(map, function(el) {
-                return el.name.indexOf(name) !== -1;
-            }).color;
-            this.childNodes[0].style.fill = color;
+    d3.selectAll("circle").attr("fill", function(e){
+        return scale(e.gos.length).hex();
+    });
+}
+
+TreeView.prototype.setGoTerms = function(anno){
+    var root = this.treeVis.root(),
+        leaves = root.get_all_leaves(),
+        gos = null,
+        termLists = null;
+
+    //first set leave go terms
+    _.each(leaves, function(el){
+        gos = anno.find(el.data().name);
+        el.data().gos = gos ? gos.goterms : [];
+    });
+    //then apply intersection of child go terms for all other nodes
+    root.apply(function(n){
+        termLists = [];
+        leaves = n.get_all_leaves();
+        _.each(leaves, function(l){
+            termLists.push(l.data().gos);
         });
+        n.data().gos = _.intersection.apply(null, termLists);
+    });
+
 }
 
 },{"tnt.tree":267,"underscore":285}],9:[function(require,module,exports){
@@ -618,6 +728,7 @@ var msa = require("msa");
 var TreeView = require("./tree-view");
 var Xpress = require("biojs-xpression");
 var _ = require("underscore");
+var Anno = require("./anno");
 
 var View = module.exports = function(c){
     this.m = null;
@@ -653,6 +764,7 @@ View.prototype.init = function(data){
         return m;
     };
     this.tree = new TreeView(data.phylotree);
+    this.tree.setGoTerms(this.c.anno);
     this.tree.render();
     this.m = initMsa(data.msa);
     this.arrangeMsaTree();
@@ -660,7 +772,6 @@ View.prototype.init = function(data){
     this.m.render();
     this.setTreeEvents();
     this.tree.setNodeCols(this.c.treeColorMap());
-    console.log(document.getElementById("expr"));
     this.rna = new Xpress({
         el: document.getElementById("expr"),
         data: data.expr
@@ -675,7 +786,8 @@ View.prototype.arrangeMsaTree = function(){
 
 View.prototype.setTreeEvents = function(){
     var self = this,
-        anno = null;
+        treeData = null,
+        depth = null;
 
     //tree events
     self.tree.treeVis.on("click", function(node){
@@ -684,19 +796,17 @@ View.prototype.setTreeEvents = function(){
         });
     });
     //tooltips on mouseover (dirty d3 hack)
-    $(".leaf").each(function(){
-        anno = self.c.anno.find(this.childNodes[1].innerHTML);
-        if(anno){
-            $(this).tooltipster({
-                content: $(anno.goAsHTML())
-            });
-        }
+    d3.selectAll("circle")
+        .attr("title", function(e){ return self.c.anno.annos[0].goAsHTML(e.gos); });
+    $("circle").tooltipster({
+        contentAsHTML: true
     });
 }
 
 View.prototype.setCyEvents = function(){
     var self = this,
         geneInfo = document.getElementById("gene-info"),
+        elabel = document.getElementById("edge-label"),
         anno = null,
         found = null;
 
@@ -735,6 +845,18 @@ View.prototype.setCyEvents = function(){
                     })
             }
         });
+
+        this.cyto.cy.on("tapdragover", "edge", function(evt){
+            var left  = event.clientX  + "px";
+            var top  = event.clientY  + "px";
+            elabel.style.left = left;
+            elabel.style.top = top;
+            elabel.innerHTML = this.data().experiment;
+            elabel.style.display = "block";
+        });
+        this.cyto.cy.on("tapdragout", "edge", function(evt){
+            elabel.style.display = "none";
+        });
     }
 }
 
@@ -742,11 +864,11 @@ View.prototype.setMsaEvents = function(){
     var self = this;
 
     self.m.g.on("row:click", function(data){
-        self.c.msaClick(data);
+        self.c.msaClick(data, function(){ console.log("Showing interactions after MSA click"); });
     });
 }
 
-},{"./tree-view":8,"biojs-xpression":36,"msa":54,"underscore":285}],10:[function(require,module,exports){
+},{"./anno":1,"./tree-view":8,"biojs-xpression":36,"msa":54,"underscore":285}],10:[function(require,module,exports){
 var ExprModel = module.exports = function(obj){
     var chroma = require("chroma-js");
     var scale = chroma.scale(["green", "red"]).mode("lab");
