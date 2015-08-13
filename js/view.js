@@ -25,13 +25,17 @@ View.prototype.init = function(data){
             vis: {
                 conserv: false,
                 overviewbox: false,
-                seqlogo: false,
+                seqlogo: true,
                 metacell: false
             },
             zoomer: {
                 labelIdLength: 20,
                 rowHeight: 20,
                 alignmentHeight: $(".tnt_groupDiv").children().height()-30
+            },
+            conf: {
+                registerMouseHover: true,
+                registerMouseClicks: true
             }
         };
         m = msa(opts);
@@ -139,5 +143,8 @@ View.prototype.setMsaEvents = function(){
 
     self.m.g.on("row:click", function(data){
         self.c.msaClick(data, function(){ console.log("Showing interactions after MSA click"); });
+    });
+    self.m.g.on("residue:click", function(data){
+        debugger;
     });
 }

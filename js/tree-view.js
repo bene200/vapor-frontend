@@ -4,12 +4,13 @@ var _ = require("underscore");
 var TreeView = module.exports = function(data){
     this.newick = data;
     this.treeVis = tnt().data(this.newick);
-    this.treeVis.label(tnt.label.text().height(20))
+    this.treeVis.label(tnt.label.text().text(function(){return "";})
+                                        .height(20))
                 .node_display(tnt.node_display.circle()
                 .size(5))
                 .layout(tnt.layout.vertical()
                 .width(400)
-                .scale(true));
+                .scale(false));
     this.treeDiv = document.getElementById("tnt");
     this.treeDiv.innerHTML = "";
 }

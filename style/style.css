@@ -119,7 +119,9 @@ btn-file {
     transform: rotate(359deg);
   }
 }
-
+#tnt {
+    padding-top: 102px;
+}
 #gene-info {
     display: none;
     position: absolute;
