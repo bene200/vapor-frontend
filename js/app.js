@@ -11,7 +11,7 @@ $(document).ready(function(){
 
     //Vapor REST-URL, Galaxy URL and API key
     // var restURL = "http://10.0.63.98:3000";
-    var restURL = "http://localhost:3000";
+    var restURL = "http://vapor.biojs.tgac.ac.uk:8081";
 
     //Get submit button and file from file upload and text field of file upload
     var submit = document.getElementById("submit"),

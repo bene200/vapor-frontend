@@ -1,6 +1,5 @@
 var View = require("./view");
 var CyView = require("./cyto-view");
-var RnaExpr = require("../lib/biojs-rnaexpression/js/rnaexpr");
 var msa = require("msa");
 var _ = require("underscore");
 var chroma = require("chroma-js");

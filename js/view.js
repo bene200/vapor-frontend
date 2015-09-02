@@ -142,9 +142,8 @@ View.prototype.setMsaEvents = function(){
     var self = this;
 
     self.m.g.on("row:click", function(data){
-        self.c.msaClick(data, function(){ console.log("Showing interactions after MSA click"); });
-    });
-    self.m.g.on("residue:click", function(data){
-        debugger;
+        self.c.msaClick(data, function(){ 
+            self.setCyEvents();
+        });
     });
 }
