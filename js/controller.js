@@ -35,64 +35,23 @@ var Controller = module.exports = function(obj){
 }
 
 Controller.prototype.arrangeMsaTree = function(){
-    var m = this.view.m,
+    var msa = this.msa,
         tree = this.view.tree.treeVis;
 
     var leaves = tree.root().get_all_leaves(),
-        newIds = [],
-        element = null;
-        oldId = null;
+        newMsa = [],
+        name = "",
+        msahit = null;
 
-    //loop through all leaves and search msa ids for mathches
-    //remember old ids and new ids of msa matches
-    for(var i=0; i<leaves.length; i++){
-        element = m.seqs.filter(function(el) {
-                return leaves[i].data().name.indexOf(el.get('name')) !== -1;
-            });
-        if(element !== null && element.length !== 0){
-            if(element.length > 1){
-                if(element[0].get("id").toString().length > 2){
-                    oldId = element[0].get("id");
-                }
-                else {
-                    oldId = element[1].get("id");
-                }
-            }
-            else {
-                oldId = element[0].get("id");
-            }
-            newIds.push({
-                oldid: oldId,
-                newid: i
-            });
-        }
-        else {
-            element = msa.seqs.filter(function(el) {
-                    return leaves[i].data().name.indexOf(el.get('name')) !== -1;
-                })[0];
-            newIds.push({
-                oldid: element.get("id"),
-                newid: i
-            })
-        }
+    msa = _.map(msa, function(el){ el.name = el.name.trim(); return el; });
+    newMsa.push(msa[0]);
+    for(var i=1; i<leaves.length; i++){
+        name = leaves[i].data().name;
+        msahit = _.findWhere(msa, {name: name});
+        msahit.id = i;
+        newMsa.push(msahit);
     }
-    //change msa ids according to newIds
-    for(var i=0; i<newIds.length; i++){
-        element = m.seqs.filter(function(el){
-                                        return el.get('id') === newIds[i].oldid;
-                                    });
-        element[0].set('id', newIds[i].newid);
-    }
-    m.seqs.comparator = "id";
-    m.seqs.sort();
-
-    //fix msa names
-    for(var i=0; i<leaves.length; i++){
-        leaves[i].data().vaporId = i;
-        m.seqs.at(i).set("name", leaves[i].data().name);
-    }
-
-    return [m, tree];
+    return newMsa;    
 }
 
 Controller.prototype.treeClick = function(node, success){
@@ -110,7 +69,8 @@ Controller.prototype.treeClick = function(node, success){
         names = [];
         for(var i=0; i<hide.length; i++){
             if(hide[i].data().name !== ""){
-                m.seqs.at(hide[i].data().vaporId).set("hidden", val);
+                
+                m.seqs.at(_.findWhere(self.msa, {name: hide[i].data().name}).id).set("hidden", val);
             }
         }
     };
@@ -119,6 +79,8 @@ Controller.prototype.treeClick = function(node, success){
         if(node.is_collapsed()){
             node.toggle();
             tree.update();
+            self.view.setTreeEvents();
+            self.view.tree.setNodeCols(self.treeColorMap());
             msaHide(node, false);
         }
         else {
@@ -137,6 +99,8 @@ Controller.prototype.treeClick = function(node, success){
         msaHide(node, true);
         node.toggle();
         tree.update();
+        self.view.setTreeEvents();
+        self.view.tree.setNodeCols(self.treeColorMap());
     }
 }
 
@@ -204,7 +168,7 @@ Controller.prototype.treeColorMap = function(){
         max = 0;
 
     max = _.max(d3.selectAll("circle").data(), function(e){
-            return e.gos.length;
+            if(e){ return e.gos.length; }
         }).gos.length;
     scale = chroma.scale(["grey", "#00CC66"]).domain([0, max]);
 

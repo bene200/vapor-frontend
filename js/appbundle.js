@@ -27764,7 +27764,6 @@ $(document).ready(function(){
     var Controller = require("./controller");
 
     //Vapor REST-URL, Galaxy URL and API key
-    // var restURL = "http://10.0.63.98:3000";
     var restURL = "http://vapor.biojs.tgac.ac.uk:8081";
 
     //Get submit button and file from file upload and text field of file upload
@@ -27772,7 +27771,7 @@ $(document).ready(function(){
         fileUpload = document.getElementById("candidate"),
         evalCutoff = document.getElementById("cutoff"),
         log = document.getElementById("log");
-
+    
     //init with example sequence
     fileUpload.value = ">example\nATGATGAATCAGAATTGCTTTAATTCTTGTTCACCTCTAACTGTTGATGCACTTGAACCAAAAAAATCCTCTTGTGCTGCTAAATGCATACAAGTAAATGGTCCTCTTATTGTTGGAGCTGGCCCTTCAGGCCTGGCTACTGCTGCCGTCCTTAAGCAATACAGTGTTCCGTATGTAATCATTGAACGCGCGGACTGCATTGCTTCTCTGTGGCAACACAAGACCTACGATCGGCTTAGGCTTAACGTGCCACGACAATACTGCGAATTGCCTGGCTTGCCATTTCCACCAGACTTTCCAGAGTATCCAACCAAAAACCAATTCATCAGCTACCTCGTATCTTATGCAAAGCATTTCGAGATCAAACCACAACTCAACGAGTCAGTAAACTTAGCTGGATATGATGAGACATGTGGTTTATGGAAGGTGAAAACAGTTTCTGAAATCAATGGTTCAACCTCTGAATACATGTGTAAGTGGCTTATTGTGGCCACAGGAGAGAATGCTGAGATGATAGTGCCCGAATTCGAAGGATTGCAAGATTTTGGTGGCCAGGTTATTCATGCTTGTGAGTACAAGACTGGGGAATACTATACTGGAGAAAATGTGCTGGCGGTTGGCTGTGGCAATTCCGGGATCGATATCTCACTTGATCTTTCCCAACATAATGCAAATCCATTCATGGTAGTTCGAAGCTCGGTACAGGGTCGTAATTTCCCTGAGGAAATAAACATAGTTCCAGCAATCAAGAAATTTACTCAAGGAAAAGTAGAATTTGTTAATGGACAAATTCTAGAGATCGACTCTGTTATCTTGGCAACTGGTTATACCAGCAATGTAACTTCTTGGTTAATGGAGAGTGAATTTTTTTCAAGGGAGGGATGTCCAAAAAGCCCATTCCCAAATGGTTGGAAGGGGGAGGATGGTCTCTATGCAGTTGGATTTACAGGAATAGGACTGTTTGGTGCTTCTATAGATGCCACTAATGTTGCACAAGATATTGCCAAAATTTGGAAAGAACAAATGTAG";
 
@@ -27783,6 +27782,9 @@ $(document).ready(function(){
             spinner = document.getElementById("spinner"),
             vo = null,
             inter = null;
+
+        document.getElementById("cy").style.display = "none";
+        document.getElementById("expr").style.display = "none";
 
         if(fileUpload.value === ""){
             alert("No candidate sequence");
@@ -27801,9 +27803,14 @@ $(document).ready(function(){
             }, function(err, req, body){
                 spinner.style.visibility = "hidden";
                 if(body === "NA"){
-                    log.value = "No matches. Maybe try a higher cutoff? \n" + log.value;
+                    log.value = "No matches. Maybe try a higher E-value cutoff? \n" + log.value;
                 }
+                else if(body === "TOOOMANY"){
+		    log.value = "More than 50 matches. Please try a lower E-value cut off \n" + log.value;
+		}
                 else{
+                    log.value = "Response received from server \n" + log.value;
+		    console.log(body);
                     vaporObj = {
                         msa: body.msa,
                         phylotree: body.phylotree,
@@ -27867,64 +27874,23 @@ var Controller = module.exports = function(obj){
 }
 
 Controller.prototype.arrangeMsaTree = function(){
-    var m = this.view.m,
+    var msa = this.msa,
         tree = this.view.tree.treeVis;
 
     var leaves = tree.root().get_all_leaves(),
-        newIds = [],
-        element = null;
-        oldId = null;
+        newMsa = [],
+        name = "",
+        msahit = null;
 
-    //loop through all leaves and search msa ids for mathches
-    //remember old ids and new ids of msa matches
-    for(var i=0; i<leaves.length; i++){
-        element = m.seqs.filter(function(el) {
-                return leaves[i].data().name.indexOf(el.get('name')) !== -1;
-            });
-        if(element !== null && element.length !== 0){
-            if(element.length > 1){
-                if(element[0].get("id").toString().length > 2){
-                    oldId = element[0].get("id");
-                }
-                else {
-                    oldId = element[1].get("id");
-                }
-            }
-            else {
-                oldId = element[0].get("id");
-            }
-            newIds.push({
-                oldid: oldId,
-                newid: i
-            });
-        }
-        else {
-            element = msa.seqs.filter(function(el) {
-                    return leaves[i].data().name.indexOf(el.get('name')) !== -1;
-                })[0];
-            newIds.push({
-                oldid: element.get("id"),
-                newid: i
-            })
-        }
+    msa = _.map(msa, function(el){ el.name = el.name.trim(); return el; });
+    newMsa.push(msa[0]);
+    for(var i=1; i<leaves.length; i++){
+        name = leaves[i].data().name;
+        msahit = _.findWhere(msa, {name: name});
+        msahit.id = i;
+        newMsa.push(msahit);
     }
-    //change msa ids according to newIds
-    for(var i=0; i<newIds.length; i++){
-        element = m.seqs.filter(function(el){
-                                        return el.get('id') === newIds[i].oldid;
-                                    });
-        element[0].set('id', newIds[i].newid);
-    }
-    m.seqs.comparator = "id";
-    m.seqs.sort();
-
-    //fix msa names
-    for(var i=0; i<leaves.length; i++){
-        leaves[i].data().vaporId = i;
-        m.seqs.at(i).set("name", leaves[i].data().name);
-    }
-
-    return [m, tree];
+    return newMsa;    
 }
 
 Controller.prototype.treeClick = function(node, success){
@@ -27942,7 +27908,8 @@ Controller.prototype.treeClick = function(node, success){
         names = [];
         for(var i=0; i<hide.length; i++){
             if(hide[i].data().name !== ""){
-                m.seqs.at(hide[i].data().vaporId).set("hidden", val);
+                
+                m.seqs.at(_.findWhere(self.msa, {name: hide[i].data().name}).id).set("hidden", val);
             }
         }
     };
@@ -27951,6 +27918,8 @@ Controller.prototype.treeClick = function(node, success){
         if(node.is_collapsed()){
             node.toggle();
             tree.update();
+            self.view.setTreeEvents();
+            self.view.tree.setNodeCols(self.treeColorMap());
             msaHide(node, false);
         }
         else {
@@ -27969,6 +27938,8 @@ Controller.prototype.treeClick = function(node, success){
         msaHide(node, true);
         node.toggle();
         tree.update();
+        self.view.setTreeEvents();
+        self.view.tree.setNodeCols(self.treeColorMap());
     }
 }
 
@@ -28036,7 +28007,7 @@ Controller.prototype.treeColorMap = function(){
         max = 0;
 
     max = _.max(d3.selectAll("circle").data(), function(e){
-            return e.gos.length;
+            if(e){ return e.gos.length; }
         }).gos.length;
     scale = chroma.scale(["grey", "#00CC66"]).domain([0, max]);
 
@@ -28096,6 +28067,7 @@ CytoView.prototype.setDegree = function(){
 }
 
 CytoView.prototype.setColors = function(anno){
+    console.log("Setting cytoscape colours...");
     var self = this,
         nodes = self.elements.nodes,
         edges = self.elements.edges,
@@ -28123,28 +28095,39 @@ CytoView.prototype.setColors = function(anno){
         col = scale(parseFloat(edges[i].data.confidence)).hex();
         edges[i].data.color = col;
     }
+    console.log("done");
 }
 
 CytoView.prototype.render = function(success){
     var self = this;
 
-    $('<div style="z-index:9;position:relative;height:500px;width:100%;"></div>')
-    .appendTo('#cy').cytoscape({
-        style: self.stylesheet,
-        elements: self.elements,
-        layout: {
-            name: "cose"
-        },
-        ready: function(){
-            this.fit();
-            this.center();
-            this.height(700);
-            self.cy = this;
-            success();
-        }
-    });
+    console.log("Rendering cytoscape...");
+    document.getElementById("cy").style.display = "block";   
+    document.getElementById("expr").style.display = "block";
 
-    self.drawLegend();
+    if(self.elements.nodes.length>0){
+        $('<div style="z-index:9;position:relative;height:500px;width:100%;"></div>')
+        .appendTo('#cy').cytoscape({
+            style: self.stylesheet,
+            elements: self.elements,
+            layout: {
+                name: "cose"
+            },
+            ready: function(){
+                this.fit();
+                this.center();
+                this.height(700);
+                self.cy = this;
+                success();
+            }
+        });
+        self.drawLegend();
+        console.log("done");
+    }
+    else {
+        document.getElementById("cy").innerHTML = "No interaction data available for requested gene.";
+        success();
+    }
 }
 
 CytoView.prototype.drawLegend = function(){
@@ -115211,7 +115194,7 @@ TreeView.prototype.setNodeCols = function(scale){
         name = "";
 
     d3.selectAll("circle").attr("fill", function(e){
-        return scale(e.gos.length).hex();
+        if(e){ return scale(e.gos.length).hex(); }
     });
 }
 
@@ -115254,6 +115237,7 @@ var View = module.exports = function(c){
 }
 
 View.prototype.init = function(data){
+    console.log("Initialising views...");
     var self = this;
     var initMsa = function(clustal){
         var msaDiv = document.getElementById("msa"),
@@ -115285,8 +115269,8 @@ View.prototype.init = function(data){
     this.tree = new TreeView(data.phylotree);
     this.tree.setGoTerms(this.c.anno);
     this.tree.render();
+    data.msa = this.arrangeMsaTree();
     this.m = initMsa(data.msa);
-    this.arrangeMsaTree();
     this.setMsaEvents();
     this.m.render();
     this.setTreeEvents();
@@ -115298,9 +115282,11 @@ View.prototype.init = function(data){
 }
 
 View.prototype.arrangeMsaTree = function(){
+    console.log("Aligning MSA to phylogenetic tree...");
     var arranged = this.c.arrangeMsaTree();
-    this.m = arranged[0];
-    this.tree.treeVis = arranged[1];
+    //this.tree.treeVis = arranged[1];
+    console.log("done");
+    return arranged;
 }
 
 View.prototype.setTreeEvents = function(){
@@ -115316,7 +115302,11 @@ View.prototype.setTreeEvents = function(){
     });
     //tooltips on mouseover (dirty d3 hack)
     d3.selectAll("circle")
-        .attr("title", function(e){ return self.c.anno.annos[0].goAsHTML(e.gos); });
+        .attr("title", function(e){
+            if(e){
+	        return self.c.anno.annos[0].goAsHTML(e.gos);
+            } 
+        });
     $("circle").tooltipster({
         contentAsHTML: true
     });
@@ -115383,6 +115373,7 @@ View.prototype.setMsaEvents = function(){
     var self = this;
 
     self.m.g.on("row:click", function(data){
+        console.log(data);
         self.c.msaClick(data, function(){ 
             self.setCyEvents();
         });

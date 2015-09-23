@@ -24,7 +24,7 @@ TreeView.prototype.setNodeCols = function(scale){
         name = "";
 
     d3.selectAll("circle").attr("fill", function(e){
-        return scale(e.gos.length).hex();
+        if(e){ return scale(e.gos.length).hex(); }
     });
 }
 

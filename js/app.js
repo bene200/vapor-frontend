@@ -10,7 +10,6 @@ $(document).ready(function(){
     var Controller = require("./controller");
 
     //Vapor REST-URL, Galaxy URL and API key
-    // var restURL = "http://10.0.63.98:3000";
     var restURL = "http://vapor.biojs.tgac.ac.uk:8081";
 
     //Get submit button and file from file upload and text field of file upload
@@ -18,7 +17,7 @@ $(document).ready(function(){
         fileUpload = document.getElementById("candidate"),
         evalCutoff = document.getElementById("cutoff"),
         log = document.getElementById("log");
-
+    
     //init with example sequence
     fileUpload.value = ">example\nATGATGAATCAGAATTGCTTTAATTCTTGTTCACCTCTAACTGTTGATGCACTTGAACCAAAAAAATCCTCTTGTGCTGCTAAATGCATACAAGTAAATGGTCCTCTTATTGTTGGAGCTGGCCCTTCAGGCCTGGCTACTGCTGCCGTCCTTAAGCAATACAGTGTTCCGTATGTAATCATTGAACGCGCGGACTGCATTGCTTCTCTGTGGCAACACAAGACCTACGATCGGCTTAGGCTTAACGTGCCACGACAATACTGCGAATTGCCTGGCTTGCCATTTCCACCAGACTTTCCAGAGTATCCAACCAAAAACCAATTCATCAGCTACCTCGTATCTTATGCAAAGCATTTCGAGATCAAACCACAACTCAACGAGTCAGTAAACTTAGCTGGATATGATGAGACATGTGGTTTATGGAAGGTGAAAACAGTTTCTGAAATCAATGGTTCAACCTCTGAATACATGTGTAAGTGGCTTATTGTGGCCACAGGAGAGAATGCTGAGATGATAGTGCCCGAATTCGAAGGATTGCAAGATTTTGGTGGCCAGGTTATTCATGCTTGTGAGTACAAGACTGGGGAATACTATACTGGAGAAAATGTGCTGGCGGTTGGCTGTGGCAATTCCGGGATCGATATCTCACTTGATCTTTCCCAACATAATGCAAATCCATTCATGGTAGTTCGAAGCTCGGTACAGGGTCGTAATTTCCCTGAGGAAATAAACATAGTTCCAGCAATCAAGAAATTTACTCAAGGAAAAGTAGAATTTGTTAATGGACAAATTCTAGAGATCGACTCTGTTATCTTGGCAACTGGTTATACCAGCAATGTAACTTCTTGGTTAATGGAGAGTGAATTTTTTTCAAGGGAGGGATGTCCAAAAAGCCCATTCCCAAATGGTTGGAAGGGGGAGGATGGTCTCTATGCAGTTGGATTTACAGGAATAGGACTGTTTGGTGCTTCTATAGATGCCACTAATGTTGCACAAGATATTGCCAAAATTTGGAAAGAACAAATGTAG";
 
@@ -29,6 +28,9 @@ $(document).ready(function(){
             spinner = document.getElementById("spinner"),
             vo = null,
             inter = null;
+
+        document.getElementById("cy").style.display = "none";
+        document.getElementById("expr").style.display = "none";
 
         if(fileUpload.value === ""){
             alert("No candidate sequence");
@@ -47,9 +49,14 @@ $(document).ready(function(){
             }, function(err, req, body){
                 spinner.style.visibility = "hidden";
                 if(body === "NA"){
-                    log.value = "No matches. Maybe try a higher cutoff? \n" + log.value;
+                    log.value = "No matches. Maybe try a higher E-value cutoff? \n" + log.value;
                 }
+                else if(body === "TOOOMANY"){
+		    log.value = "More than 50 matches. Please try a lower E-value cut off \n" + log.value;
+		}
                 else{
+                    log.value = "Response received from server \n" + log.value;
+		    console.log(body);
                     vaporObj = {
                         msa: body.msa,
                         phylotree: body.phylotree,

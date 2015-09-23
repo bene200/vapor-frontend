@@ -23,6 +23,9 @@ btn-file {
     width: 100%;
     position: absolute;
     top: 0px;
+    border-top-style: solid;
+    border-right-style: solid;
+    display: none;
 }
 
 #info-table {
@@ -193,4 +196,8 @@ btn-file {
     z-index: 1002;
     padding: 3px;
     border-radius: 7px;
+}
+#expr{
+    border-top-style: solid;
+    display: none;
 }

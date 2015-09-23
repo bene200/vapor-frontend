@@ -50,6 +50,7 @@ CytoView.prototype.setDegree = function(){
 }
 
 CytoView.prototype.setColors = function(anno){
+    console.log("Setting cytoscape colours...");
     var self = this,
         nodes = self.elements.nodes,
         edges = self.elements.edges,
@@ -77,28 +78,39 @@ CytoView.prototype.setColors = function(anno){
         col = scale(parseFloat(edges[i].data.confidence)).hex();
         edges[i].data.color = col;
     }
+    console.log("done");
 }
 
 CytoView.prototype.render = function(success){
     var self = this;
 
-    $('<div style="z-index:9;position:relative;height:500px;width:100%;"></div>')
-    .appendTo('#cy').cytoscape({
-        style: self.stylesheet,
-        elements: self.elements,
-        layout: {
-            name: "cose"
-        },
-        ready: function(){
-            this.fit();
-            this.center();
-            this.height(700);
-            self.cy = this;
-            success();
-        }
-    });
+    console.log("Rendering cytoscape...");
+    document.getElementById("cy").style.display = "block";   
+    document.getElementById("expr").style.display = "block";
 
-    self.drawLegend();
+    if(self.elements.nodes.length>0){
+        $('<div style="z-index:9;position:relative;height:500px;width:100%;"></div>')
+        .appendTo('#cy').cytoscape({
+            style: self.stylesheet,
+            elements: self.elements,
+            layout: {
+                name: "cose"
+            },
+            ready: function(){
+                this.fit();
+                this.center();
+                this.height(700);
+                self.cy = this;
+                success();
+            }
+        });
+        self.drawLegend();
+        console.log("done");
+    }
+    else {
+        document.getElementById("cy").innerHTML = "No interaction data available for requested gene.";
+        success();
+    }
 }
 
 CytoView.prototype.drawLegend = function(){

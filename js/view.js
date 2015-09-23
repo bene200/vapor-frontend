@@ -13,6 +13,7 @@ var View = module.exports = function(c){
 }
 
 View.prototype.init = function(data){
+    console.log("Initialising views...");
     var self = this;
     var initMsa = function(clustal){
         var msaDiv = document.getElementById("msa"),
@@ -44,8 +45,8 @@ View.prototype.init = function(data){
     this.tree = new TreeView(data.phylotree);
     this.tree.setGoTerms(this.c.anno);
     this.tree.render();
+    data.msa = this.arrangeMsaTree();
     this.m = initMsa(data.msa);
-    this.arrangeMsaTree();
     this.setMsaEvents();
     this.m.render();
     this.setTreeEvents();
@@ -57,9 +58,11 @@ View.prototype.init = function(data){
 }
 
 View.prototype.arrangeMsaTree = function(){
+    console.log("Aligning MSA to phylogenetic tree...");
     var arranged = this.c.arrangeMsaTree();
-    this.m = arranged[0];
-    this.tree.treeVis = arranged[1];
+    //this.tree.treeVis = arranged[1];
+    console.log("done");
+    return arranged;
 }
 
 View.prototype.setTreeEvents = function(){
@@ -75,7 +78,11 @@ View.prototype.setTreeEvents = function(){
     });
     //tooltips on mouseover (dirty d3 hack)
     d3.selectAll("circle")
-        .attr("title", function(e){ return self.c.anno.annos[0].goAsHTML(e.gos); });
+        .attr("title", function(e){
+            if(e){
+	        return self.c.anno.annos[0].goAsHTML(e.gos);
+            } 
+        });
     $("circle").tooltipster({
         contentAsHTML: true
     });
@@ -142,6 +149,7 @@ View.prototype.setMsaEvents = function(){
     var self = this;
 
     self.m.g.on("row:click", function(data){
+        console.log(data);
         self.c.msaClick(data, function(){ 
             self.setCyEvents();
         });
