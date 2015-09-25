@@ -27782,12 +27782,12 @@ $(document).ready(function(){
             spinner = document.getElementById("spinner"),
             vo = null,
             inter = null;
-
+            
         document.getElementById("cy").style.display = "none";
         document.getElementById("expr").style.display = "none";
 
-        if(fileUpload.value === ""){
-            alert("No candidate sequence");
+        if(!checkInput(query)){
+            alert("Please provide an input sequence in FASTA format.");
         }
         else {
             //Clear page before processing the new query
@@ -27833,6 +27833,21 @@ $(document).ready(function(){
         document.getElementById("gene-info").innerHTML = "";
         document.getElementById("expr").innerHTML = "";
         document.getElementById("legend").innerHTML = "";
+    }
+    function checkInput(query){
+        var parts = query.split("\n");
+        var ok = true;
+        if(parts.length !== 2){
+            ok = false;
+        }
+        if(parts[0][0] !== ">"){
+            ok = false;
+        }
+        var pattern = /[0-9]/;
+        if(pattern.test(parts[1])){
+            ok = false;
+        }
+        return ok;
     }
 });
 
