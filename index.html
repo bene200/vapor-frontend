@@ -8,27 +8,40 @@
         <link rel="stylesheet" href="http://emepyc.github.io/tnt/v0/tnt.css" type="text/css" />
         <link type="text/css" rel="stylesheet" href="http://parce.li/bundle/msa@0.4.0">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Not exactly VAPoR anymore</title>
+        <title>VAPoR</title>
         <script type="text/javascript" src="//code.jquery.com/jquery-1.7.0.min.js"></script>
         <script type="text/javascript" src="./lib/tooltipster-master/js/jquery.tooltipster.min.js"></script>
+        <script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script> 
+        <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
+        <script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script> 
     </head>
     <body>
         <!-- whole page conte   nt -->
         <div class="container-fluid" id="vapor">
             <div class="container" id="page-content">
                 <div class="container" id="headerwrap">
-                    <h1>Annotation of Plant Genes based on Homologues in A. thaliana</h1>
+                    <h1>Annotation of Plant Genes based on Homologues in <i>A. thaliana</i></h1>
                 </div>
                 <!-- vapor user interface -->
                 <div class="container" id="program">
                     <!-- program input and description -->
                     <div class="row" id="descr">
+			<div class="col-md-6">
                         <br><br>
-                        <p>This tool designed visualises genetic information about a sequence based on information about homologous sequences in <i>a. thaliana</i>.</p>
+                        <p>A tool designed to annotate plant genomes using <i>A. thaliana</i> homology. For an example walk-through on how to use VAPoR please click on <a href="./tutorial/tutorial.html">"Tutorial"</a>.</p>
+			</div>
+			<div class="col-md-3">
+			    <br><br>
+			    <form action="./tutorial/tutorial.html"><button class="btn btn-primary">Tutorial</button></form>    
+			</div>
+                        <div class="col-md-3">
+			    <br><br>
+			    <button class="btn btn-primary" id="report">Report</button>
+   			</div>
                     </div>
                     <div class="row" id="opts">
                         <h4>Options</h4>
-                        E-value threshold: <input type="text" id="cutoff" value="1.0e-10"><br>
+                        E-value threshold: <input type="text" id="cutoff" value="1.0e-60"><br>
                     </div>
                     <div class="row" id="input">
                         <div class="col-md-6" id="upload">
@@ -68,6 +81,34 @@
                             <div id="expr"></div>
                         </div>
                     </div>
+                </div>
+                <div class="container" id="footer">
+                    <h2>About</h2>
+		    <div class="row">
+                    <div class="col-md-4">
+			<h3>Authors</h3>
+                        <ul>
+			    <li>Benedikt Rauscher (TGAC/TUM)</li>
+                            <li>Benjamen White (TGAC)</li>
+			    <li>Tatyana Goldberg (TUM)</li>
+                            <li>Burkhard Rost (TUM)</li>
+                            <li>Manuel Corpas (TGAC)</li>
+			</ul>
+                    </div>
+		    <div class="col-md-4">
+ 		        <h3>Contact</h3>
+                        <a href="mailto:benedikt.rauscher@tgac.ac.uk?Subject=VAPoR" target="_top">benedikt.rauscher@tgac.ac.uk</a>
+		    </div>
+		    <div class="col-md-4">
+			<h3>License</h3>
+			<p>VAPoR is licensed under the <a href="https://opensource.org/licenses/MIT">MIT</a> open software license.
+		    </div>
+		    </div>
+	            <div class="row">
+			<div class="col-md-3"><img src="./data/NEW_TGAC_no_Partners.png" id="tgac"></div>
+			<div class="col-md-7"><p style="padding-top: 10px;">VAPoR is a collaborative project between <a href="http://tgac.ac.uk">The Genome Analysis Centre</a> and the <a href="http://rostlab.org">Rostlab</a> at the <a href="http://tum.de">Technical University of Munich</a>.</div>
+                        <div class="col-md-2"><img src="./tutorial/figures/rostlab.png" id="rlab"></div>
+		    </div>
                 </div>
             </div>
         </div>

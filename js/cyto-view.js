@@ -87,6 +87,7 @@ CytoView.prototype.render = function(success){
     console.log("Rendering cytoscape...");
     document.getElementById("cy").style.display = "block";   
     document.getElementById("expr").style.display = "block";
+    document.getElementById("gene-info").style.height = "500px";
 
     if(self.elements.nodes.length>0){
         $('<div style="z-index:9;position:relative;height:500px;width:100%;"></div>')
@@ -114,6 +115,7 @@ CytoView.prototype.render = function(success){
 }
 
 CytoView.prototype.drawLegend = function(){
+    document.getElementById("legend").style.paddingTop = "500px";
     var svg = d3.select("#legend").append("svg")
         .attr("width", 555)
         .attr("height", 105);
